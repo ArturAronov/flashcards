@@ -1,8 +1,8 @@
 import type { Component } from "solid-js";
-import { NavNoAuth } from "./components/nav/NavNoAuth";
+import { Nav } from "./components/Nav";
 
 const App: Component = () => {
-  return <NavNoAuth />;
+  return <></>;
 };
 
 export default App;
