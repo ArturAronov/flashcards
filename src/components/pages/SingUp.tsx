@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { serverUrl } from "../../lib/serverUrl";
 
 type InputT = {
   email: string;
@@ -12,20 +13,39 @@ const initialInput = {
   passwordConfirmation: "",
 };
 
+type DataT = {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
+
+const postUserSignUp = async (data: DataT) => {
+  const response = await fetch(serverUrl + "/auth/sign-up", {
+    mode: "cors",
+    method: "post",
+    credentials: "include",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  console.log(response);
+
+  return await response.json();
+};
+
 export const SignUp = () => {
   const [input, setInput] = createSignal<InputT>(initialInput);
-  const [query, setQuery] = createSignal<InputT>(initialInput);
-  const [error, setError] = createSignal<string>("");
+  const [formError, setFormError] = createSignal<string>("");
 
   const submitForm = (e: any) => {
     e.preventDefault();
-    if (!input().email) setError("Please enter valid email");
-    else if (!input().password) setError("Please enter valid password");
+    if (!input().email) setFormError("Please enter valid email");
+    else if (!input().password) setFormError("Please enter valid password");
     else if (!input().passwordConfirmation)
-      setError("Please enter valid password confirmation");
+      setFormError("Please enter valid password confirmation");
     else if (input().password !== input().passwordConfirmation)
-      setError("Passwords don't match");
-    else setQuery(input());
+      setFormError("Passwords don't match");
+    else postUserSignUp(input());
   };
 
   return (
@@ -68,7 +88,7 @@ export const SignUp = () => {
             type="password"
             class="input input-bordered w-full"
             onInput={(e) => {
-              if (error().length) setError("");
+              if (formError().length) setFormError("");
               setInput({
                 ...input(),
                 passwordConfirmation: e.currentTarget.value,
@@ -76,7 +96,7 @@ export const SignUp = () => {
             }}
           />
         </div>
-        <div class="text-error text-sm text-center mt-3">{error()}</div>
+        <div class="text-error text-sm text-center mt-3">{formError()}</div>
         <div class="mt-5 flex justify-center">
           <button
             type="submit"
