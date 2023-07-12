@@ -1,5 +1,6 @@
-import { createSignal } from "solid-js";
+import { Show, createEffect, createSignal } from "solid-js";
 import { serverUrl } from "../../lib/serverUrl";
+import { useLoadingUserId, useUserId } from "../../states/useUser";
 
 type InputT = {
   email: string;
@@ -20,6 +21,9 @@ type DataT = {
 };
 
 const postUserSignUp = async (data: DataT) => {
+  const [_, setLoadingUserId] = useLoadingUserId();
+
+  setLoadingUserId(true);
   const response = await fetch(serverUrl + "/auth/sign-up", {
     mode: "cors",
     method: "post",
@@ -27,13 +31,15 @@ const postUserSignUp = async (data: DataT) => {
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
   });
-
-  console.log(response);
+  setLoadingUserId(false);
 
   return await response.json();
 };
 
 export const SignUp = () => {
+  const [userId, setUserId] = useUserId();
+  const [loadingUserId] = useLoadingUserId();
+
   const [input, setInput] = createSignal<InputT>(initialInput);
   const [formError, setFormError] = createSignal<string>("");
 
@@ -45,8 +51,17 @@ export const SignUp = () => {
       setFormError("Please enter valid password confirmation");
     else if (input().password !== input().passwordConfirmation)
       setFormError("Passwords don't match");
-    else postUserSignUp(input());
+    else
+      postUserSignUp(input())
+        .then((res) => setUserId(res.data.id))
+        .catch((_) =>
+          setFormError("Something went wrong, please try again...")
+        );
   };
+
+  createEffect(() => {
+    if (!!userId("").length) window.location.href = "/";
+  }, userId(""));
 
   return (
     <section class="hero mt-8">
@@ -63,9 +78,10 @@ export const SignUp = () => {
             autocomplete="off"
             value={input().email}
             class="input input-bordered w-full"
-            onInput={(e) =>
-              setInput({ ...input(), email: e.currentTarget.value })
-            }
+            onInput={(e) => {
+              setInput({ ...input(), email: e.currentTarget.value });
+              setFormError("");
+            }}
           />
         </div>
         <div class="mt-3">
@@ -75,9 +91,10 @@ export const SignUp = () => {
           <input
             type="password"
             class="input input-bordered w-full"
-            onInput={(e) =>
-              setInput({ ...input(), password: e.currentTarget.value })
-            }
+            onInput={(e) => {
+              setInput({ ...input(), password: e.currentTarget.value });
+              setFormError("");
+            }}
           />
         </div>
         <div class="mt-3">
@@ -88,23 +105,38 @@ export const SignUp = () => {
             type="password"
             class="input input-bordered w-full"
             onInput={(e) => {
-              if (formError().length) setFormError("");
               setInput({
                 ...input(),
                 passwordConfirmation: e.currentTarget.value,
               });
+              setFormError("");
             }}
           />
         </div>
         <div class="text-error text-sm text-center mt-3">{formError()}</div>
         <div class="mt-5 flex justify-center">
-          <button
-            type="submit"
-            class="btn btn-ghost no-animation"
-            onClick={(e) => submitForm(e)}
+          <Show
+            when={!loadingUserId(false)}
+            fallback={
+              <button
+                type="submit"
+                disabled={!!formError()}
+                class="btn btn-ghost no-animation w-32"
+                onClick={(e) => submitForm(e)}
+              >
+                <span class="loading loading-spinner"></span>
+              </button>
+            }
           >
-            Submit
-          </button>
+            <button
+              type="submit"
+              disabled={!!formError()}
+              class="btn btn-ghost no-animation w-32"
+              onClick={(e) => submitForm(e)}
+            >
+              Submit
+            </button>
+          </Show>
         </div>
       </div>
     </section>
