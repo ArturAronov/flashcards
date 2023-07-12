@@ -2,7 +2,7 @@ import { onMount, type Component } from "solid-js";
 import { Route, Router, Routes } from "@solidjs/router";
 import { Settings } from "./components/pages/Settings";
 import { SignIn } from "./components/pages/SignIn";
-import { SignUp } from "./components/pages/SingUp";
+import { SignUp } from "./components/pages/SignUp";
 import { useUserId } from "./states/useUser";
 import { serverUrl } from "./lib/serverUrl";
 import { Nav } from "./components/Nav";
