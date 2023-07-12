@@ -1,8 +1,23 @@
 import { A } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
+import { useUserId } from "../states/useUser";
+import { serverUrl } from "../lib/serverUrl";
+
+const postUserSignOut = async () => {
+  const [_, setUserId] = useUserId();
+  await fetch(serverUrl + "/auth/sign-out", {
+    mode: "cors",
+    method: "post",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  setUserId("");
+};
 
 export const Nav = () => {
-  const [userId, setUserId] = createSignal<string | null>(null);
+  const [userId, _] = useUserId();
+
   return (
     <div class="navbar bg-base-100 shadow-lg">
       <div class="mx-3 flex justify-between w-full">
@@ -10,7 +25,7 @@ export const Nav = () => {
           Hello World
         </A>
         <Show
-          when={userId()}
+          when={!!userId("").length}
           fallback={
             <div>
               <A
@@ -35,7 +50,10 @@ export const Nav = () => {
             >
               Settings
             </A>
-            <a class="btn-square btn no-animation w-28 btn-ghost text-error">
+            <a
+              class="btn-square btn no-animation w-28 btn-ghost text-error"
+              onClick={() => postUserSignOut()}
+            >
               Sign Out
             </a>
           </div>
