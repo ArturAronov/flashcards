@@ -101,7 +101,7 @@ export const SignIn = () => {
                 class="btn btn-ghost no-animation w-32"
                 onClick={(e) => submitForm(e)}
               >
-                <span class="loading loading-spinner">a</span>
+                <span class="loading loading-spinner"></span>
               </button>
             }
           >
