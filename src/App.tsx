@@ -6,6 +6,7 @@ import { SignUp } from "./components/pages/SignUp";
 import { useUserId } from "./states/useUser";
 import { serverUrl } from "./lib/serverUrl";
 import { Nav } from "./components/Nav";
+import { Collections } from "./components/pages/Collections";
 
 const postUserSignIn = async () => {
   const response = await fetch(serverUrl + "/auth/validate-session", {
@@ -30,16 +31,19 @@ const App: Component = () => {
   });
 
   return (
-    <Router>
-      <header>
-        <Nav />
-      </header>
-      <Routes>
-        <Route path="/settings" component={Settings} />
-        <Route path="/sign-in" component={SignIn} />
-        <Route path="/sign-up" component={SignUp} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <header>
+          <Nav />
+        </header>
+        <Routes>
+          <Route path="/sign-in" component={SignIn} />
+          <Route path="/sign-up" component={SignUp} />
+          <Route path="/settings" component={Settings} />
+          <Route path="/collections" component={Collections} />
+        </Routes>
+      </Router>
+    </>
   );
 };
 

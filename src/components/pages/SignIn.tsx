@@ -53,7 +53,7 @@ export const SignIn = () => {
   };
 
   createEffect(() => {
-    if (!!userId("").length) window.location.href = "/";
+    if (!!userId("").length) window.location.href = "/collections";
   }, userId(""));
 
   return (

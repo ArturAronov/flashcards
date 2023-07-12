@@ -45,6 +45,12 @@ export const Nav = () => {
         >
           <div>
             <A
+              href="/collections"
+              class="btn-square btn no-animation w-28 btn-ghost"
+            >
+              Collections
+            </A>
+            <A
               href="/settings"
               class="btn-square btn no-animation w-28 btn-ghost"
             >
