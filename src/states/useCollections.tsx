@@ -1,14 +1,21 @@
 import { createSignal } from "solid-js";
 
-const [openedNewCollection, setOpenedNewCollection] =
-  createSignal<boolean>(false);
+export type UserCollectionsT = {
+  id: string;
+  name: string;
+  description: string;
+  date_created: string;
+};
+
+const [userCollections, setUserCollections] = createSignal<
+  Array<UserCollectionsT>
+>([]);
+
 const [loadingNewCollection, setLoadingNewCollection] =
   createSignal<boolean>(false);
 
-export const useOpenedNewCollection = () => [
-  openedNewCollection,
-  setOpenedNewCollection,
-];
+export const useUserCollections = () => [userCollections, setUserCollections];
+
 export const useLoadingNewCollection = () => [
   loadingNewCollection,
   setLoadingNewCollection,
