@@ -58,7 +58,7 @@ export const SignIn = () => {
 
   return (
     <section class="hero mt-8">
-      <div class="sm:m-8 shadow-xl sm:p-8 p-5 rounded-md sm:w-96 w-80">
+      <form onSubmit={(e) => submitForm(e)} class="sm:m-8 shadow-xl sm:p-8 p-5 rounded-md sm:w-96 w-80">
         <h1 class="text-3xl text-center font-bold font-primary text-primary">
           Sign In
         </h1>
@@ -115,7 +115,7 @@ export const SignIn = () => {
             </button>
           </Show>
         </div>
-      </div>
+      </form>
     </section>
   );
 };

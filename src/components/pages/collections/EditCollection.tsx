@@ -105,14 +105,14 @@ const EditCollection = ({
         <input
           type="text"
           value={editInput().name}
-          class="input input-bordered w-full"
+          class="input input-bordered w-full focus:border-neutral/50 !outline-none"
           onChange={(e) =>
             setEditInput({ ...editInput(), name: e.currentTarget.value })
           }
         />
         <textarea
           value={editInput().description}
-          class="textarea w-full textarea-bordered h-2/3 resize-none mt-1"
+          class="textarea w-full textarea-bordered h-2/3 resize-none mt-1 focus:border-neutral/50 !outline-none"
           onChange={(e) =>
             setEditInput({ ...editInput(), description: e.currentTarget.value })
           }
@@ -174,7 +174,7 @@ const EditCollection = ({
 
         <button
           class="btn w-fit no-animation card group rounded-br-[15px] rounded-bl-none rounded-t-none"
-          onClick={() => setActiveCollectionEdit(collection.id)}
+          onClick={() => setActiveCollectionEdit('')}
         >
           Cancel
         </button>

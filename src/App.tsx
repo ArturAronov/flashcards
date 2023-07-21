@@ -32,20 +32,22 @@ const App: Component = () => {
   });
 
   return (
-    <div class="relative">
+    <main class="relative">
       <Router>
         <header class="sticky top-0 z-10">
           <Nav />
         </header>
-        <Routes>
-          <Route path="/sign-in" component={SignIn} />
-          <Route path="/sign-up" component={SignUp} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/collection/:collectionId" component={Collection} />
-          <Route path="/collections" component={Collections} />
-        </Routes>
+        <div class="my-10 mx-5">
+          <Routes>
+            <Route path="/sign-in" component={SignIn} />
+            <Route path="/sign-up" component={SignUp} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/collection/:collectionId" component={Collection} />
+            <Route path="/collections" component={Collections} />
+          </Routes>
+        </div>
       </Router>
-    </div>
+    </main>
   );
 };
 

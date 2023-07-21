@@ -67,7 +67,7 @@ const NewCollection = () => {
       >
         <div class="hero h-full">
           <div class="hero-content">
-            <div>
+            <form onSubmit={(e) => handleCollectionSubmit(e)}>
               <label class="label -mb-1.5">
                 <span class="label-text">Group Name</span>
               </label>
@@ -120,7 +120,7 @@ const NewCollection = () => {
                   </button>
                 </Show>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </Show>

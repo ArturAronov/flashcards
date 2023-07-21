@@ -20,13 +20,12 @@ export const Collections = () => {
 
   onMount(() => {
     if (!userCollections([]).length) {
-      console.log("Fetching user's collections");
       getUserCollections().then((res) => setUserCollections(res.data));
     }
   });
 
   return (
-    <main class="my-10 hero min-h-full ">
+    <section class="hero min-h-full ">
       <section class="hero-content text-center">
         <div>
           <div>
@@ -43,6 +42,6 @@ export const Collections = () => {
           </div>
         </div>
       </section>
-    </main>
+    </section>
   );
 };
