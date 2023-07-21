@@ -1,6 +1,5 @@
-import { createSignal, onMount } from "solid-js";
+import { onMount } from "solid-js";
 import { serverUrl } from "../../../lib/serverUrl";
-import { classNames } from "../../../lib/classNames";
 import { useUserCollections } from "../../../states/useCollections";
 import CollectionCard from "./CollectionCard";
 import NewCollection from "./NewCollection";
@@ -17,9 +16,6 @@ const getUserCollections = async () => {
 };
 
 export const Collections = () => {
-  const [openedNewCollection, setOpenedNewCollection] =
-    createSignal<boolean>(false);
-
   const [userCollections, setUserCollections] = useUserCollections();
 
   onMount(() => {
@@ -43,19 +39,7 @@ export const Collections = () => {
             ))}
           </div>
           <div class="w-full flex justify-center mt-8">
-            <div
-              class={classNames(
-                openedNewCollection()
-                  ? "w-96 h-96"
-                  : "w-48 h-48 cursor-pointer hover:shadow-md active:shadow-inner select-none",
-                "card shadow-xl flex justify-center"
-              )}
-              onClick={() =>
-                !openedNewCollection() && setOpenedNewCollection(true)
-              }
-            >
-              <NewCollection />
-            </div>
+            <NewCollection />
           </div>
         </div>
       </section>

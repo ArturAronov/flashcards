@@ -4,8 +4,9 @@ import {
   useUserCollections,
 } from "../../../states/useCollections";
 import { serverUrl } from "../../../lib/serverUrl";
+import { classNames } from "../../../lib/classNames";
 
-type NewGroupT = {
+export type NewGroupT = {
   name: string;
   description: string;
 };
@@ -49,70 +50,81 @@ const NewCollection = () => {
     }
     setLoadingNewCollection(false);
   };
+
   return (
-    <Show
-      when={openedNewCollection()}
-      fallback={<div class="card-body text-8xl text-secondary hero">+</div>}
+    <div
+      class={classNames(
+        openedNewCollection()
+          ? "w-96 h-96"
+          : "w-48 h-48 cursor-pointer select-none",
+        "card flex justify-center border border-primary/25 hover:shadow-lg"
+      )}
+      onClick={() => !openedNewCollection() && setOpenedNewCollection(true)}
     >
-      <div class="hero h-full">
-        <div class="hero-content">
-          <div>
-            <label class="label -mb-1.5">
-              <span class="label-text">Group Name</span>
-            </label>
-            <input
-              type="text"
-              autocomplete="off"
-              class="input input-bordered w-full"
-              onInput={(e) =>
-                setNewCollectionInput({
-                  ...newCollectionInput(),
-                  name: e.currentTarget.value,
-                })
-              }
-            />
-            <label class="label -mb-1.5">
-              <span class="label-text">Description</span>
-            </label>
-            <input
-              type="text"
-              autocomplete="off"
-              class="input input-bordered w-full"
-              onInput={(e) =>
-                setNewCollectionInput({
-                  ...newCollectionInput(),
-                  description: e.currentTarget.value,
-                })
-              }
-            />
-            <div class="mt-3 flex justify-between">
-              <button
-                class="btn btn-warning btn-sm btn-outline w-24"
-                onClick={() => setOpenedNewCollection(false)}
-              >
-                Cancel
-              </button>
-              <Show
-                when={loadingNewCollection(true)}
-                fallback={
-                  <button
-                    class="btn btn-ghost btn-sm w-24"
-                    disabled={!newCollectionInput().name.length}
-                    onClick={(e) => handleCollectionSubmit(e)}
-                  >
-                    Save
-                  </button>
+      <Show
+        when={openedNewCollection()}
+        fallback={<div class="card-body text-8xl text-secondary hero">+</div>}
+      >
+        <div class="hero h-full">
+          <div class="hero-content">
+            <div>
+              <label class="label -mb-1.5">
+                <span class="label-text">Group Name</span>
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                class="input input-bordered w-full"
+                onInput={(e) =>
+                  setNewCollectionInput({
+                    ...newCollectionInput(),
+                    name: e.currentTarget.value,
+                  })
                 }
-              >
-                <button class="btn btn-ghost btn-sm w-24" disabled>
-                  <span class="loading loading-spinner"></span>
+              />
+              <label class="label -mb-1.5">
+                <span class="label-text">Description</span>
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                class="input input-bordered w-full"
+                onInput={(e) =>
+                  setNewCollectionInput({
+                    ...newCollectionInput(),
+                    description: e.currentTarget.value,
+                  })
+                }
+              />
+              <div class="mt-3 flex justify-between">
+                <button
+                  class="btn btn-warning btn-sm btn-outline w-24"
+                  onClick={() => setOpenedNewCollection(false)}
+                >
+                  Cancel
                 </button>
-              </Show>
+                <Show
+                  when={loadingNewCollection(true)}
+                  fallback={
+                    <button
+                      class="btn btn-ghost btn-sm w-24"
+                      disabled={!newCollectionInput().name.length}
+                      onClick={(e) => handleCollectionSubmit(e)}
+                    >
+                      Save
+                    </button>
+                  }
+                >
+                  <button class="btn btn-ghost btn-sm w-24" disabled>
+                    <span class="loading loading-spinner"></span>
+                  </button>
+                </Show>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Show>
+      </Show>
+    </div>
   );
 };
 
