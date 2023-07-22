@@ -1,8 +1,10 @@
 import { Show, createSignal, onMount } from "solid-js";
 import { useParams } from "@solidjs/router";
+import { format } from "date-fns";
 import { serverUrl } from "../../lib/serverUrl";
-import { useLoadingOpenCollection, useOpenCollection } from "../../states/useCollection";
 import { classNames } from "../../lib/classNames";
+import { useCollectionQuestionAnswers } from "../../states/useQuestionAnswers";
+import { useLoadingOpenCollection, useOpenCollection } from "../../states/useCollection";
 
 const getCollection = async (collectionId: string) => {
   const response = await fetch(`${serverUrl}/collections/${collectionId}`, {
@@ -39,8 +41,11 @@ const Collection = () => {
 
   const [openCollection, setOpenCollection] = useOpenCollection();
   const [loadingOpenCollection, setLoadingOpenCollection] = useLoadingOpenCollection();
+  const [collectionQuestionAnswers, setCollectionQuestionAnswers] = useCollectionQuestionAnswers()
 
   const [isSaveLoading, setIsSaveLoading] =
+    createSignal<boolean>(false);
+  const [isDeleteActive, setIsDeleteActive] =
     createSignal<boolean>(false);
   const [openedNewCollection, setOpenedNewCollection] =
     createSignal<boolean>(false);
@@ -51,20 +56,6 @@ const Collection = () => {
   const [inputQuestion, setInputQuestion] =
     createSignal<string>('');
   const [error, setError] = createSignal<string>('')
-
-  onMount(() => {
-    if (!openCollection()?.id || openCollection()?.id !== collectionId) {
-      getCollection(collectionId).then(res => {
-        const collection = res.data.collection[0]
-        const questions = res.data.questions
-        const answers = res.data.answers
-
-        // @ts-ignore
-        setOpenCollection(collection)
-        setLoadingOpenCollection(false)
-      })
-    }
-  });
 
   const handleAddAnswer = (e: any) => {
     e.preventDefault()
@@ -111,9 +102,36 @@ const Collection = () => {
     }
   }
 
+  onMount(() => {
+    if (!openCollection()?.id || openCollection()?.id !== collectionId) {
+      getCollection(collectionId).then(res => {
+        const { collection, questionAnswers } = res.data
+        // @ts-ignore
+        setOpenCollection(collection[0])
+        setLoadingOpenCollection(false)
+        setCollectionQuestionAnswers(questionAnswers)
+      })
+    }
+  });
+
+  const handleQuestionDelete = () => {
+    if(isDeleteActive()) {
+
+    } else {
+      setIsDeleteActive(true)
+    }
+  }
+
+  const handleQuestionEdit = () => {
+    if(isDeleteActive()) {
+      setIsDeleteActive(false)
+
+    } else {
+    }
+  }
 
   return (
-    <section class='hero'>
+    <section>
       <Show
         when={loadingOpenCollection(true) || openCollection()?.id !== collectionId}
         fallback={
@@ -124,7 +142,7 @@ const Collection = () => {
                 openedNewCollection()
                   ? "w-80 h-full"
                   : "w-48 h-48 cursor-pointer select-none",
-                "card border border-primary/25 hover:shadow-lg"
+                "card border border-primary/25 hover:shadow-md"
               )}
               onClick={() => !openedNewCollection() && setOpenedNewCollection(true)}
             >
@@ -211,7 +229,84 @@ const Collection = () => {
           </div>
         }
       >
-        <span class="loading loading-spinner loading-lg my-10"></span>
+        <div class='hero'>
+          <span class="loading loading-spinner loading-lg my-10"></span>
+        </div>
+      </Show>
+      {/* {console.log(collectionQuestionAnswers())} */}
+      <Show
+        when={collectionQuestionAnswers([]).length}
+        fallback={'Nothing Here'}
+      >
+        <div class='hero'>
+          <div class="join join-vertical w-2/3">
+            {collectionQuestionAnswers([]).map(element => {
+              return(
+                <div class="collapse collapse-arrow join-item border border-base-300">
+                  <input type="radio" name="question-answers" checked />
+                  <div class="collapse-title text-xl font-medium">
+                    {element.name}
+                  </div>
+                  <div class="collapse-content flex justify-between">
+                    <ul>
+
+                    {element.answers.map(answer => {
+                      return(
+                        <li>{answer}</li>
+                        )
+                      })}
+                      </ul>
+                    <div class='w-52 h-full border border-base-300 hover:border-base-200 hover:shadow-lg rounded-lg'>
+                      <div class='p-2'>
+                        <div class='text-sm mb-2'>{`Created on: ${format(new Date(element.date_created), 'dd/MMM/yyyy')}`}</div>
+                        <div class="badge text-sm badge-success gap-2 block my-1.5 h-7 text-center pt-1 w-28">
+                          {`Correct: ${element.correct_answer}`}
+                        </div>
+                        <div class="badge text-sm badge-error gap-2 block my-1.5 h-7 text-center pt-1 w-28">
+                          {`Wrong: ${element.wrong_answer}`}
+                        </div>
+                      </div>
+                      <div class='w-full'>
+                        <button
+                          title='Delete'
+                          class='no-animation btn btn-error w-1/2 rounded-r-none rounded-tl-none rounded-bl-[7px]'
+                          onClick={() => handleQuestionDelete()}
+                        >
+                          <Show
+                            when={!isDeleteActive()}
+                            fallback='Confirm'
+                          >
+                            Delete
+                          </Show>
+                        </button>
+                        <Show
+                          when={!isDeleteActive()}
+                          fallback={
+                            <button
+                              title='Edit'
+                              class='no-animation btn btn-ghost w-1/2 rounded-l-none rounded-tr-none rounded-br-[7px]'
+                              onClick={() => handleQuestionEdit()}
+                            >
+                              Cancel
+                            </button>
+                          }
+                        >
+                          <button
+                            title='Edit'
+                            class='no-animation btn btn-info w-1/2 rounded-l-none rounded-tr-none rounded-br-[7px]'
+                            onClick={() => handleQuestionEdit()}
+                          >
+                              Edit
+                          </button>
+                        </Show>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </Show>
     </section>
   )
