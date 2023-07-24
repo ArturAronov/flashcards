@@ -3,7 +3,10 @@ import { useParams } from "@solidjs/router";
 import { format } from "date-fns";
 import { serverUrl } from "../../lib/serverUrl";
 import { classNames } from "../../lib/classNames";
-import { useCollectionQuestionAnswers } from "../../states/useQuestionAnswers";
+import {
+  AnswersT,
+  useCollectionQuestionAnswers,
+} from "../../states/useQuestionAnswers";
 import {
   useLoadingOpenCollection,
   useOpenCollection,
@@ -23,10 +26,11 @@ const getCollection = async (collectionId: string) => {
 type PostQuestionAnswersT = {
   collectionId: string;
   questionName: string;
-  answers: Array<string>;
+  answers: Array<AnswersT>;
 };
 
 const postQuestionAnswers = async (data: PostQuestionAnswersT) => {
+  console.log(data);
   const response = await fetch(`${serverUrl}/question-answer`, {
     mode: "cors",
     method: "post",
