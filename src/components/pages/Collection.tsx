@@ -26,11 +26,10 @@ const getCollection = async (collectionId: string) => {
 type PostQuestionAnswersT = {
   collectionId: string;
   questionName: string;
-  answers: Array<AnswersT>;
+  answers: Array<string>;
 };
 
 const postQuestionAnswers = async (data: PostQuestionAnswersT) => {
-  console.log(data);
   const response = await fetch(`${serverUrl}/question-answer`, {
     mode: "cors",
     method: "post",
@@ -97,7 +96,9 @@ const Collection = () => {
         answers: inputAnswers(),
       };
       postQuestionAnswers(data)
-        .then((_) => {
+        .then((res) => {
+          console.log(res)
+          setCollectionQuestionAnswers(res.data)
           setInputAnswer("");
           setInputAnswers([]);
           setInputQuestion("");
@@ -266,13 +267,28 @@ const Collection = () => {
                   </div>
                   <div class="collapse-content flex justify-between">
                     <ul>
-                      {element.answers.map((answer) => {
+                      {element.answers.map((answer, index) => {
                         return (
                           <li>
-                            <span>{answer}</span>
-                            <span class="badge badge-success">
-                              {answer.correct}
-                            </span>
+                            <Show
+                              when={index}
+                              fallback={''}
+                              >
+                              <div class="divider"/>
+                            </Show>
+                            <span>{answer.name}</span>
+
+                            <div>
+                              <span class="badge badge-success mr-1">
+                                {`correct: ${answer.correct}`}
+                              </span>
+                              <span class="badge badge-info mr-1">
+                                {`skipped: ${answer.skipped}`}
+                              </span>
+                              <span class="badge badge-error">
+                                {`wrong: ${answer.wrong}`}
+                              </span>
+                            </div>
                           </li>
                         );
                       })}

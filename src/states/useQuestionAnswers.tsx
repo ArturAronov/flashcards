@@ -4,7 +4,8 @@ export type AnswersT = {
   id: string;
   name: string;
   wrong: number;
-  right: number;
+  correct: number;
+  skipped: number;
 };
 
 export type CollectionQuestionAnswersT = {
