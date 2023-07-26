@@ -7,7 +7,7 @@ import { useUserId } from "./states/useUser";
 import { serverUrl } from "./lib/serverUrl";
 import { Nav } from "./components/Nav";
 import { Collections } from "./components/pages/collections/Collections";
-import Collection from "./components/pages/Collection";
+import Collection from "./components/pages/collection/Collection";
 
 const postUserSignIn = async () => {
   const response = await fetch(serverUrl + "/auth/validate-session", {

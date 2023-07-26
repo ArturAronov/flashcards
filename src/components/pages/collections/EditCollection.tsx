@@ -6,6 +6,7 @@ import {
 import { serverUrl } from "../../../lib/serverUrl";
 import { useUserId } from "../../../states/useUser";
 import { NewGroupT } from "./NewCollection";
+import LoadingSpinner from "../../LoadingSpinner";
 
 type PropsT = {
   collection: UserCollectionsT;
@@ -128,7 +129,7 @@ const EditCollection = ({
               onClick={() => handleCollectionDelete(collection.id)}
             >
               <Show when={isBtnLoading()} fallback="Confirm">
-                <span class="loading loading-spinner"></span>
+                <LoadingSpinner size="default" />
               </Show>
             </button>
           }
@@ -166,7 +167,7 @@ const EditCollection = ({
                   </svg>
                 }
               >
-                <span class="loading loading-spinner"></span>
+                <LoadingSpinner size="default" />
               </Show>
             </button>
           </>
@@ -174,7 +175,7 @@ const EditCollection = ({
 
         <button
           class="btn w-fit no-animation card group rounded-br-[15px] rounded-bl-none rounded-t-none"
-          onClick={() => setActiveCollectionEdit('')}
+          onClick={() => setActiveCollectionEdit("")}
         >
           Cancel
         </button>

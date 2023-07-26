@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from "solid-js";
 import { serverUrl } from "../../lib/serverUrl";
 import { useLoadingUserId, useUserId } from "../../states/useUser";
+import LoadingSpinner from "../LoadingSpinner";
 
 type InputT = {
   email: string;
@@ -58,7 +59,10 @@ export const SignIn = () => {
 
   return (
     <section class="hero mt-8">
-      <form onSubmit={(e) => submitForm(e)} class="sm:m-8 shadow-xl sm:p-8 p-5 rounded-md sm:w-96 w-80">
+      <form
+        onSubmit={(e) => submitForm(e)}
+        class="sm:m-8 shadow-xl sm:p-8 p-5 rounded-md sm:w-96 w-80"
+      >
         <h1 class="text-3xl text-center font-bold font-primary text-primary">
           Sign In
         </h1>
@@ -101,7 +105,7 @@ export const SignIn = () => {
                 class="btn btn-ghost no-animation w-32"
                 onClick={(e) => submitForm(e)}
               >
-                <span class="loading loading-spinner"></span>
+                <LoadingSpinner size="default" />
               </button>
             }
           >

@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal } from "solid-js";
 import { serverUrl } from "../../lib/serverUrl";
 import { useLoadingUserId, useUserId } from "../../states/useUser";
+import LoadingSpinner from "../LoadingSpinner";
 
 type InputT = {
   email: string;
@@ -124,7 +125,7 @@ export const SignUp = () => {
                 class="btn btn-ghost no-animation w-32"
                 onClick={(e) => submitForm(e)}
               >
-                <span class="loading loading-spinner"></span>
+                <LoadingSpinner size="default" />
               </button>
             }
           >

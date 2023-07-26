@@ -5,6 +5,7 @@ import {
 } from "../../../states/useCollections";
 import { serverUrl } from "../../../lib/serverUrl";
 import { classNames } from "../../../lib/classNames";
+import LoadingSpinner from "../../LoadingSpinner";
 
 export type NewGroupT = {
   name: string;
@@ -116,7 +117,7 @@ const NewCollection = () => {
                   }
                 >
                   <button class="btn btn-ghost btn-sm w-24" disabled>
-                    <span class="loading loading-spinner"></span>
+                    <LoadingSpinner size="default" />
                   </button>
                 </Show>
               </div>
