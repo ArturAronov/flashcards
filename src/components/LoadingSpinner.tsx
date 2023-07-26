@@ -2,7 +2,7 @@ type PropsT = {
   size: "default" | "large";
 };
 
-const Loading = ({ size }: PropsT) => {
+const LoadingSpinner = ({ size }: PropsT) => {
   if (size === "large") {
     return <span class="loading loading-spinner loading-lg my-10"></span>;
   } else {
@@ -10,4 +10,4 @@ const Loading = ({ size }: PropsT) => {
   }
 };
 
-export default Loading;
+export default LoadingSpinner;
