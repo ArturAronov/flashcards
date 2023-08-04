@@ -3,12 +3,8 @@ import {
   CollectionQuestionAnswersT,
   useCollectionQuestionAnswers,
 } from "../../../states/useQuestionAnswers";
-import SettingsIcon from "../../icons/SettingsIcon";
-import { classNames } from "../../../lib/classNames";
-import SaveIcon from "../../icons/SaveIcon";
-import DeleteIcon from "../../icons/DeleteIcon";
-import QuestionAnswerForms from "../../QuestionAnswerForms";
 import ModalEditQuestionAnswer from "../../modals/ModalEditQuestionAnswer";
+import SettingsIcon from "../../icons/SettingsIcon";
 
 const QuestionAnswerList = () => {
   const [collectionQuestionAnswers, _] = useCollectionQuestionAnswers();
