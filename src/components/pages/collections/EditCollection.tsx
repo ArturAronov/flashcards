@@ -7,8 +7,8 @@ import { serverUrl } from "../../../lib/serverUrl";
 import { useUserId } from "../../../states/useUser";
 import { NewGroupT } from "./NewCollection";
 import LoadingSpinner from "../../LoadingSpinner";
-import DeleteIcon from "../../Icons/DeleteIcon";
-import SaveIcon from "../../Icons/SaveIcon";
+import DeleteIcon from "../../icons/DeleteIcon";
+import SaveIcon from "../../icons/SaveIcon";
 
 type PropsT = {
   collection: UserCollectionsT;
@@ -149,12 +149,7 @@ const EditCollection = ({
               class="grow btn btn-primary no-animation card group rounded-none"
               onClick={() => handleCollectionSave()}
             >
-              <Show
-                when={isBtnLoading()}
-                fallback={
-                  <SaveIcon />
-                }
-              >
+              <Show when={isBtnLoading()} fallback={<SaveIcon />}>
                 <LoadingSpinner size="default" />
               </Show>
             </button>

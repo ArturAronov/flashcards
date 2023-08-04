@@ -2,7 +2,7 @@ import { Show, createSignal } from "solid-js";
 import { UserCollectionsT } from "../../../states/useCollections";
 import { A } from "@solidjs/router";
 import EditCollection from "./EditCollection";
-import SettingsIcon from "../../Icons/SettingsIcon";
+import SettingsIcon from "../../icons/SettingsIcon";
 
 const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
   const [activeCollectionEdit, setActiveCollectionEdit] =
@@ -31,7 +31,7 @@ const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
         <div>
           <p class="text-xs text-error font-bold">{error()}</p>
           <button
-            title='Edit'
+            title="Edit"
             class="btn w-full btn-ghost no-animation card group rounded-bl-[15px] rounded-br-[15px] rounded-t-none"
             onClick={() => {
               setError("");
