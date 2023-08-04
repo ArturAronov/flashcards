@@ -1,8 +1,8 @@
 import { Show, createSignal } from "solid-js";
 import { UserCollectionsT } from "../../../states/useCollections";
 import { A } from "@solidjs/router";
-import SettingsIcon from "../../icons/SettingsIcon";
 import EditCollection from "./EditCollection";
+// import SettingsIcon from "../../icons/SettingsIcon";
 
 const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
   const [activeCollectionEdit, setActiveCollectionEdit] =
@@ -38,7 +38,7 @@ const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
               setActiveCollectionEdit(collection.id);
             }}
           >
-            <SettingsIcon />
+            {/* <SettingsIcon /> */}
           </button>
         </div>
       </Show>
