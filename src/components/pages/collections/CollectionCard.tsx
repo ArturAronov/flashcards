@@ -2,7 +2,7 @@ import { Show, createSignal } from "solid-js";
 import { UserCollectionsT } from "../../../states/useCollections";
 import { A } from "@solidjs/router";
 import EditCollection from "./EditCollection";
-import SettingsIcon from "../../icons/SettingsIcon.tsx";
+import { SettingsIcon } from "../../icons/SettingsIcon";
 
 const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
   const [activeCollectionEdit, setActiveCollectionEdit] =
