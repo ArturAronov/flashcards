@@ -2,9 +2,14 @@ import { Show, createSignal } from "solid-js";
 import { serverUrl } from "../../../lib/serverUrl";
 import { useOpenCollection } from "../../../states/useCollection";
 import { classNames } from "../../../lib/classNames";
-import { useCollectionQuestionAnswers } from "../../../states/useQuestionAnswers";
+import {
+  AnswersT,
+  useCollectionQuestionAnswers,
+} from "../../../states/useQuestionAnswers";
 import LoadingSpinner from "../../LoadingSpinner";
 import QuestionAnswerForms from "../../QuestionAnswerForms";
+import DeleteIcon from "../../icons/DeleteIcon";
+import SaveIcon from "../../icons/SaveIcon";
 
 type PostQuestionAnswersT = {
   collectionId: string;
@@ -27,9 +32,12 @@ const postQuestionAnswers = async (data: PostQuestionAnswersT) => {
 const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
   const [_, setCollectionQuestionAnswers] = useCollectionQuestionAnswers();
 
+  const [isBtnLoading, setIsBtnLoading] = createSignal<boolean>(false);
   const [inputAnswer, setInputAnswer] = createSignal<string>("");
   const [isSaveLoading, setIsSaveLoading] = createSignal<boolean>(false);
-  const [inputAnswers, setInputAnswers] = createSignal<Array<string>>([]);
+  const [inputAnswers, setInputAnswers] = createSignal<
+    Array<AnswersT | string>
+  >([]);
   const [inputQuestion, setInputQuestion] = createSignal<string>("");
   const [error, setError] = createSignal<string>("");
   const [openedNewCollection, setOpenedNewCollection] =
@@ -70,20 +78,20 @@ const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
         questionName: inputQuestion().trim(),
         answers: inputAnswers(),
       };
-      postQuestionAnswers(data)
-        .then((res) => {
-          console.log(res);
-          setCollectionQuestionAnswers(res.data);
-          setInputAnswer("");
-          setInputAnswers([]);
-          setInputQuestion("");
-          setIsSaveLoading(false);
-          setOpenedNewCollection(false);
-        })
-        .catch((_) => {
-          setIsSaveLoading(false);
-          setError("Something went wrong, please try again later...");
-        });
+      // postQuestionAnswers(data)
+      //   .then((res) => {
+      //     console.log(res);
+      //     setCollectionQuestionAnswers(res.data);
+      //     setInputAnswer("");
+      //     setInputAnswers([]);
+      //     setInputQuestion("");
+      //     setIsSaveLoading(false);
+      //     setOpenedNewCollection(false);
+      //   })
+      //   .catch((_) => {
+      //     setIsSaveLoading(false);
+      //     setError("Something went wrong, please try again later...");
+      //   });
     }
   };
 
@@ -101,7 +109,37 @@ const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
         when={openedNewCollection()}
         fallback={<div class="card-body text-8xl text-secondary hero">+</div>}
       >
-        {/* <QuestionAnswerForms /> */}
+        <div class="p-8">
+          <QuestionAnswerForms
+            question={inputQuestion()}
+            answers={inputAnswers()}
+            onDeleteAnswer={setInputAnswers}
+            onUpdateAnswer={setInputAnswers}
+            onAddAnswer={(answer) =>
+              setInputAnswers([...inputAnswers(), answer])
+            }
+          />
+          {console.log(inputAnswers())}
+          <div class="flex mt-8">
+            <button
+              title="Save"
+              class="grow btn btn-primary no-animation card group rounded-md rounded-r-none"
+              // onClick={() => handleCollectionSave()}
+            >
+              <Show when={isBtnLoading()} fallback={<SaveIcon />}>
+                <LoadingSpinner size="default" />
+              </Show>
+            </button>
+
+            <button
+              title="Cancel"
+              class="grow btn w-fit no-animation card group rounded-md rounded-l-none"
+              onClick={() => setOpenedNewCollection(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </Show>
     </div>
   );

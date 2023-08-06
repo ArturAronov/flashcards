@@ -4,7 +4,7 @@ import {
   useCollectionQuestionAnswers,
 } from "../../../states/useQuestionAnswers";
 import ModalEditQuestionAnswer from "../../modals/ModalEditQuestionAnswer";
-import { SettingsIcon } from "../../icons/SettingsIcon";
+import SettingsIcon from "../../icons/SettingsIcon";
 
 const QuestionAnswerList = () => {
   const [collectionQuestionAnswers, _] = useCollectionQuestionAnswers();

@@ -1,9 +1,14 @@
-import { createSignal } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import { AnswersT } from "../states/useQuestionAnswers";
+import DeleteIcon from "./icons/DeleteIcon";
 
 type PropsT = {
   question: string;
-  answers: Array<AnswersT>;
+  answers: Array<AnswersT | string>;
+  onAddAnswer: (answer: AnswersT | string) => void;
+  onDeleteAnswer: (answers: Array<AnswersT | string>) => void;
+  onUpdateAnswer: (answers: Array<AnswersT | string>) => void;
+
   // error: string;
   // answers: Array<string>;
   // updateQuestion: (val: string) => void;
@@ -11,31 +16,53 @@ type PropsT = {
 };
 
 const QuestionAnswerForms = (props: PropsT) => {
+  const [answer, setAnswer] = createSignal<string>("");
   const [question, setQuestion] = createSignal<string>(props.question);
-  const [answers, setAnswers] = createSignal<Array<AnswersT> | string>(
+  const [answers, setAnswers] = createSignal<Array<AnswersT | string>>(
     props.answers
   );
+  const [confirmDelete, setConfirmDelete] = createSignal<boolean>(false);
+  const [confirmDeleteByIndex, setConfirmDeleteByIndex] = createSignal<
+    number | null
+  >(null);
 
   return (
-    <form>
+    <form onSubmit={(e) => e.preventDefault()}>
       <span class="label-text">Question</span>
       <input
         type="text"
         value={question()}
-        class="input input-bordered w-full focus:border-neutral/50 !outline-none"
+        class="input input-bordered w-full border-neutral/50 !outline-none focus:border-neutral"
         onChange={(e) => {
           // !!error && setError("");
           setQuestion(e.currentTarget.value);
         }}
       />
       <div class="divider" />
-      {props.answers.map((answer) => {
+      {props.answers.map((answer, index) => {
+        let _answer;
+        const isAnswerString = typeof answer === "string";
+        if (isAnswerString) _answer = answer;
+        else _answer = answer.name;
+
         return (
-          <div class="flex my-1">
+          <div class="flex mt-2 mb-1">
             <input
               type="text"
-              value={answer.name}
-              class="input input-bordered w-full focus:border-neutral/50 !outline-none mt-2"
+              value={_answer}
+              class="input input-bordered w-full rounded-r-none border-neutral/50 !outline-none focus:border-neutral"
+              onChange={(e) => {
+                if (isAnswerString) {
+                  const updatedAnswer = props.answers.map(
+                    (changedAnswer, changedIndex) => {
+                      if (changedIndex === index) return e.target.value;
+                      else return changedAnswer;
+                    }
+                  );
+                  props.onUpdateAnswer(updatedAnswer);
+                } else {
+                }
+              }}
               // onChange={(e) => {
               //   const updatedInput = answers.map((input, inputIndex) => {
               //     if (index === inputIndex)
@@ -46,9 +73,51 @@ const QuestionAnswerForms = (props: PropsT) => {
               //   setInputAnswers(updatedInput);
               // }}
             />
+            <button
+              class="btn btn-error rounded-l-none w-20 no-animation -ml-[1px]"
+              onClick={() => {
+                if (!confirmDelete()) {
+                  setConfirmDelete(true);
+                  setConfirmDeleteByIndex(index);
+                } else {
+                  const updatedAnswers = props.answers.filter(
+                    (answer, i) => i !== index && answer
+                  );
+                  props.onDeleteAnswer(updatedAnswers);
+                  setConfirmDeleteByIndex(null);
+                  setConfirmDelete(false);
+                }
+              }}
+            >
+              <Show
+                when={confirmDelete() && confirmDeleteByIndex() === index}
+                fallback={<DeleteIcon />}
+              >
+                Confirm
+              </Show>
+            </button>
           </div>
         );
       })}
+      <div class="flex mt-2">
+        <input
+          type="text"
+          value={answer()}
+          class="input input-bordered w-full border-neutral/50 !outline-none rounded-r-none focus:border-neutral"
+          onChange={(e) => setAnswer(e.currentTarget.value)}
+        />
+        <button
+          class="btn btn-outline btn-info rounded-l-none no-animation w-20 -ml-[1px]"
+          onClick={() => {
+            if (answer().trim().length) {
+              props.onAddAnswer(answer());
+              setAnswer("");
+            }
+          }}
+        >
+          Add
+        </button>
+      </div>
     </form>
   );
 };
