@@ -1,6 +1,6 @@
 import { Show, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import { serverUrl } from "../../../lib/serverUrl";
-import { useOpenCollection } from "../../../states/useCollection";
 import { classNames } from "../../../lib/classNames";
 import {
   AnswersT,
@@ -8,13 +8,11 @@ import {
 } from "../../../states/useQuestionAnswers";
 import LoadingSpinner from "../../LoadingSpinner";
 import QuestionAnswerForms from "../../QuestionAnswerForms";
-import DeleteIcon from "../../icons/DeleteIcon";
-import SaveIcon from "../../icons/SaveIcon";
 
 type PostQuestionAnswersT = {
   collectionId: string;
   questionName: string;
-  answers: Array<string>;
+  answers: Array<AnswersT | string>;
 };
 
 const postQuestionAnswers = async (data: PostQuestionAnswersT) => {
@@ -32,66 +30,46 @@ const postQuestionAnswers = async (data: PostQuestionAnswersT) => {
 const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
   const [_, setCollectionQuestionAnswers] = useCollectionQuestionAnswers();
 
-  const [isBtnLoading, setIsBtnLoading] = createSignal<boolean>(false);
-  const [inputAnswer, setInputAnswer] = createSignal<string>("");
   const [isSaveLoading, setIsSaveLoading] = createSignal<boolean>(false);
-  const [inputAnswers, setInputAnswers] = createSignal<
-    Array<AnswersT | string>
-  >([]);
   const [inputQuestion, setInputQuestion] = createSignal<string>("");
-  const [error, setError] = createSignal<string>("");
+  const [inputAnswers, setInputAnswers] = createStore<
+    Array<AnswersT | { name: string }>
+  >([]);
   const [openedNewCollection, setOpenedNewCollection] =
     createSignal<boolean>(false);
 
-  const handleAddAnswer = (e: any) => {
-    e.preventDefault();
-
-    if (inputAnswer().trim()) {
-      setInputAnswers([...inputAnswers(), inputAnswer()]);
-      setInputAnswer("");
-    }
-  };
-
   const handleCancel = () => {
-    setError("");
-    setInputAnswer("");
     setInputAnswers([]);
     setInputQuestion("");
+    setIsSaveLoading(false);
     setOpenedNewCollection(false);
   };
 
   const handleSave = (e: any) => {
     e.preventDefault();
 
-    if (
-      !!inputQuestion().trim() &&
-      (!!inputAnswers().length || !!inputAnswer().trim())
-    ) {
+    const answers = inputAnswers
+      .map((answer) => answer.name)
+      .filter((answer) => answer.trim().length && answer);
+
+    if (!!inputQuestion().trim() && !!inputAnswers.length) {
       setIsSaveLoading(true);
-      if (!!inputAnswer().trim()) {
-        const updateValues = [...inputAnswers(), inputAnswer()];
-        setInputAnswers(updateValues);
-        setInputAnswer("");
-      }
+
       const data = {
         collectionId,
         questionName: inputQuestion().trim(),
-        answers: inputAnswers(),
+        answers: answers,
       };
-      // postQuestionAnswers(data)
-      //   .then((res) => {
-      //     console.log(res);
-      //     setCollectionQuestionAnswers(res.data);
-      //     setInputAnswer("");
-      //     setInputAnswers([]);
-      //     setInputQuestion("");
-      //     setIsSaveLoading(false);
-      //     setOpenedNewCollection(false);
-      //   })
-      //   .catch((_) => {
-      //     setIsSaveLoading(false);
-      //     setError("Something went wrong, please try again later...");
-      //   });
+
+      postQuestionAnswers(data)
+        .then((res) => {
+          setCollectionQuestionAnswers(res.data);
+          setInputAnswers([]);
+          setInputQuestion("");
+          setIsSaveLoading(false);
+          setOpenedNewCollection(false);
+        })
+        .catch((_) => setIsSaveLoading(false));
     }
   };
 
@@ -111,32 +89,38 @@ const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
       >
         <div class="p-8">
           <QuestionAnswerForms
+            answers={inputAnswers}
             question={inputQuestion()}
-            answers={inputAnswers()}
-            onDeleteAnswer={setInputAnswers}
             onUpdateAnswer={setInputAnswers}
+            onUpdateQuestion={(a) => setInputQuestion(a)}
             onAddAnswer={(answer) =>
-              setInputAnswers([...inputAnswers(), answer])
+              setInputAnswers([...inputAnswers, { name: answer }])
             }
+            onDeleteAnswer={(deletedIndex) => {
+              const updatedAnswers = inputAnswers.filter((answer, index) => {
+                if (index !== deletedIndex) return answer;
+              });
+              setInputAnswers(updatedAnswers);
+            }}
           />
-          {console.log(inputAnswers())}
           <div class="flex mt-8">
             <button
-              title="Save"
-              class="grow btn btn-primary no-animation card group rounded-md rounded-r-none"
-              // onClick={() => handleCollectionSave()}
+              title="Cancel"
+              class="grow btn w-fit no-animation card group rounded-md rounded-r-none"
+              onClick={() => handleCancel()}
             >
-              <Show when={isBtnLoading()} fallback={<SaveIcon />}>
-                <LoadingSpinner size="default" />
-              </Show>
+              Cancel
             </button>
 
             <button
-              title="Cancel"
-              class="grow btn w-fit no-animation card group rounded-md rounded-l-none"
-              onClick={() => setOpenedNewCollection(false)}
+              disabled={!inputQuestion().length || !inputAnswers.length}
+              title="Save"
+              class="grow btn btn-primary no-animation card group rounded-md rounded-l-none"
+              onClick={(e) => handleSave(e)}
             >
-              Cancel
+              <Show when={isSaveLoading()} fallback="Save">
+                <LoadingSpinner size="default" />
+              </Show>
             </button>
           </div>
         </div>
