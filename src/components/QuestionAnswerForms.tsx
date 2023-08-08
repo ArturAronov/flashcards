@@ -1,26 +1,22 @@
-import {
-  For,
-  Index,
-  Show,
-  createComputed,
-  createEffect,
-  createSignal,
-} from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import { AnswersT } from "../states/useQuestionAnswers";
 import DeleteIcon from "./icons/DeleteIcon";
 
 type PropsT = {
   question: string;
-  answers: Array<AnswersT | string>;
+  answers: Array<AnswersT | { name: string }>;
   onUpdateQuestion: (val: string) => void;
   onDeleteAnswer: (deletedIndex: number) => void;
-  onAddAnswer: (answer: AnswersT | string) => void;
-  onUpdateAnswer: (updatedAnswer: string, updatedIndex: number) => void;
+  onAddAnswer: (answer: string) => void;
+  onUpdateAnswer: (
+    updatedIndex: number,
+    objKey: string,
+    updatedAnswer: string
+  ) => void;
 };
 
 const QuestionAnswerForms = (props: PropsT) => {
   const [answerInput, setAnswerInput] = createSignal<string>("");
-
   const [confirmDelete, setConfirmDelete] = createSignal<boolean>(false);
   const [confirmDeleteByIndex, setConfirmDeleteByIndex] = createSignal<
     number | null
@@ -36,23 +32,17 @@ const QuestionAnswerForms = (props: PropsT) => {
         onInput={(e) => props.onUpdateQuestion(e.target.value)}
       />
       <div class="divider" />
-      <For each={props.answers} fallback={""}>
+      <For each={props.answers}>
         {(answer, index) => {
-          console.log(answer);
-          let _answer;
-          const isAnswerString = typeof answer === "string";
-          if (isAnswerString) _answer = answer;
-          else _answer = answer.name;
-
           return (
             <div class="flex mt-2 mb-1">
               <input
                 disabled={index() === confirmDeleteByIndex()}
                 type="text"
-                value={_answer}
+                value={answer.name}
                 class="input input-bordered w-full rounded-r-none border-neutral/50 !outline-none focus:border-neutral truncate"
                 onInput={(e) =>
-                  props.onUpdateAnswer(e.currentTarget.value, index())
+                  props.onUpdateAnswer(index(), "name", e.currentTarget.value)
                 }
               />
               <Show
@@ -84,9 +74,6 @@ const QuestionAnswerForms = (props: PropsT) => {
                   title="Confirm Delete Answer"
                   class="btn btn-error w-20 no-animation rounded-l-none -ml-[1px] text-xs"
                   onClick={() => {
-                    // const updatedAnswers = props.answers.filter(
-                    //   (answer, i) => i !== index && answer
-                    // );
                     props.onDeleteAnswer(index());
                     setConfirmDeleteByIndex(null);
                     setConfirmDelete(false);
@@ -108,6 +95,7 @@ const QuestionAnswerForms = (props: PropsT) => {
         />
         <button
           class="btn btn-outline btn-info rounded-l-none no-animation w-20 -ml-[1px] text-xs"
+          disabled={!answerInput().trim().length}
           onClick={() => {
             if (answerInput().trim().length) {
               props.onAddAnswer(answerInput());
