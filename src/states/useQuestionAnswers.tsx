@@ -10,7 +10,7 @@ export type AnswersT = {
 
 export type CollectionQuestionAnswersT = {
   questionId: string;
-  answerId: string;
+  collectionId: string;
   name: string;
   date_created: string;
   answers: Array<AnswersT>;
