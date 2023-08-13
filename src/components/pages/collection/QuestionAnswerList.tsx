@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { For, Index, Show, createSignal } from "solid-js";
 import {
   CollectionQuestionAnswersT,
   useCollectionQuestionAnswers,
@@ -12,18 +12,19 @@ const QuestionAnswerList = () => {
   const [isModalOpen, setIsModalOpen] = createSignal<boolean>(false);
   const [activeQuestionAnswer, setActiveQuestionAnswer] =
     createSignal<CollectionQuestionAnswersT | null>(null);
+
   return (
     <>
       <ModalEditQuestionAnswer
         isModalOpen={isModalOpen()}
+        setIsModalOpen={setIsModalOpen}
         activeQuestionAnswer={activeQuestionAnswer()}
         setActiveQuestionAnswer={setActiveQuestionAnswer}
-        setIsModalOpen={setIsModalOpen}
       />
-      <Show when={collectionQuestionAnswers([]).length} fallback={""}>
-        <div class="hero">
-          <div class="join join-vertical w-full md:w-2/3">
-            {collectionQuestionAnswers([]).map((element) => {
+      <div class="hero">
+        <div class="join join-vertical w-full md:w-2/3">
+          <Index each={collectionQuestionAnswers([])}>
+            {(element) => {
               return (
                 <div
                   class="collapse collapse-arrow rounded-lg join-item border border-base-300"
@@ -31,11 +32,12 @@ const QuestionAnswerList = () => {
                 >
                   <input type="radio" name="question-answers" />
                   <div class="collapse-title text-xl font-medium">
-                    {element.name}
+                    {element().name}
                   </div>
                   <Show
                     when={
-                      activeQuestionAnswer()?.questionId === element.questionId
+                      activeQuestionAnswer()?.questionId ===
+                      element().questionId
                     }
                     fallback={<></>}
                   >
@@ -48,44 +50,46 @@ const QuestionAnswerList = () => {
                     </button>
                   </Show>
                   <ul class="collapse-content">
-                    {element.answers.map((answer, index) => {
-                      if (answer.id && answer.name.trim().length)
-                        return (
-                          <li>
-                            <Show
-                              when={index}
-                              fallback={
-                                <div class="border-top border-[0.5px] border-base-300 -mx-4" />
-                              }
-                            >
-                              <div class="mt-5">
-                                <div class="border-bottom border-[0.5px] border-base-300 -mx-4" />
+                    <For each={element().answers}>
+                      {(answer, index) => {
+                        if (answer.id && answer.name.trim().length)
+                          return (
+                            <li>
+                              <Show
+                                when={index()}
+                                fallback={
+                                  <div class="border-top border-[0.5px] border-base-300 -mx-4" />
+                                }
+                              >
+                                <div class="mt-5">
+                                  <div class="border-bottom border-[0.5px] border-base-300 -mx-4" />
+                                </div>
+                              </Show>
+                              <div class="flex justify-between mb-3">
+                                <p class="py-3 mr-3">{answer.name}</p>
                               </div>
-                            </Show>
-                            <div class="flex justify-between mb-3">
-                              <p class="py-3 mr-3">{answer.name}</p>
-                            </div>
-                            <div>
-                              <span class="badge badge-success mr-1">
-                                {`correct: ${answer.correct}`}
-                              </span>
-                              <span class="badge badge-info mr-1">
-                                {`skipped: ${answer.skipped}`}
-                              </span>
-                              <span class="badge badge-error">
-                                {`wrong: ${answer.wrong}`}
-                              </span>
-                            </div>
-                          </li>
-                        );
-                    })}
+                              <div>
+                                <span class="badge badge-success mr-1">
+                                  {`correct: ${answer.correct}`}
+                                </span>
+                                <span class="badge badge-info mr-1">
+                                  {`skipped: ${answer.skipped}`}
+                                </span>
+                                <span class="badge badge-error">
+                                  {`wrong: ${answer.wrong}`}
+                                </span>
+                              </div>
+                            </li>
+                          );
+                      }}
+                    </For>
                   </ul>
                 </div>
               );
-            })}
-          </div>
+            }}
+          </Index>
         </div>
-      </Show>
+      </div>
     </>
   );
 };
