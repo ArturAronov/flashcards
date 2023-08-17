@@ -1,5 +1,6 @@
 import { For, Index, Show, createSignal } from "solid-js";
 import {
+  AnswersT,
   CollectionQuestionAnswersT,
   useCollectionQuestionAnswers,
 } from "../../../states/useQuestionAnswers";
@@ -23,21 +24,26 @@ const QuestionAnswerList = () => {
       />
       <div class="hero">
         <div class="join join-vertical w-full md:w-2/3">
-          <Index each={collectionQuestionAnswers([])}>
+          <For each={collectionQuestionAnswers([])}>
             {(element) => {
               return (
                 <div
                   class="collapse collapse-arrow rounded-lg join-item border border-base-300"
                   onClick={() => setActiveQuestionAnswer(element)}
                 >
-                  <input type="radio" name="question-answers" />
+                  <input
+                    type="radio"
+                    name="question-answers"
+                    checked={
+                      activeQuestionAnswer()?.questionId === element.questionId
+                    }
+                  />
                   <div class="collapse-title text-xl font-medium">
-                    {element().name}
+                    {element.name}
                   </div>
                   <Show
                     when={
-                      activeQuestionAnswer()?.questionId ===
-                      element().questionId
+                      activeQuestionAnswer()?.questionId === element.questionId
                     }
                     fallback={<></>}
                   >
@@ -50,7 +56,7 @@ const QuestionAnswerList = () => {
                     </button>
                   </Show>
                   <ul class="collapse-content">
-                    <For each={element().answers}>
+                    <For each={element.answers}>
                       {(answer, index) => {
                         if (answer.id && answer.name.trim().length)
                           return (
@@ -87,7 +93,7 @@ const QuestionAnswerList = () => {
                 </div>
               );
             }}
-          </Index>
+          </For>
         </div>
       </div>
     </>
