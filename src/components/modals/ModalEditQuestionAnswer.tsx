@@ -47,19 +47,27 @@ const deleteAnswer = async (answerId: string) => {
 };
 
 const ModalEditQuestionAnswer = (props: PropsT) => {
-  // const [_, setCollectionQuestionAnswers] = useCollectionQuestionAnswers();
-  const [collectionQuestionAnswers, setCollectionQuestionAnswers] =
-    useCollectionQuestionAnswers();
+  const [_, setCollectionQuestionAnswers] = useCollectionQuestionAnswers();
 
   const [confirmDelete, setConfirmDelete] = createSignal<boolean>(false);
   const [isSaveLoading, setIsSaveLoading] = createSignal<boolean>(false);
-  const [answers, setAnswers] = createSignal<
+  const [question, setQuestion] = createSignal<string>("");
+  const [inputAnswers, setInputAnswers] = createSignal<
     Array<AnswersT | { name: string }>
   >([]);
-  const [dbAnswers, setDbAnswers] = createSignal<Array<AnswersT>>([]);
-  const [inputAnswers, setInputAnswers] = createStore<
-    Array<AnswersT | { name: string }>
-  >([]);
+  const [answers, setAnswers] = createStore<Array<AnswersT | { name: string }>>(
+    []
+  );
+
+  const handleCancel = () => resetStates();
+
+  const resetStates = () => {
+    setQuestion("");
+    setInputAnswers([]);
+    setConfirmDelete(false);
+    setIsSaveLoading(false);
+    props.setIsModalOpen(false);
+  };
 
   const handleDelete = () => {
     if (confirmDelete()) {
@@ -71,75 +79,109 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
     }
   };
 
-  const handleCancel = () => {
-    setInputAnswers([]);
-    setConfirmDelete(false);
-    props.setIsModalOpen(false);
-  };
-
   const handleSave = () => {
-    if (
-      props.activeQuestionAnswer?.questionId &&
-      props.activeQuestionAnswer?.collectionId
-    ) {
+    if (!!props.activeQuestionAnswer) {
       setIsSaveLoading(true);
-      const data = {
-        answers: inputAnswers.map((element) => element.name),
-        questionId: props.activeQuestionAnswer.questionId,
-        collectionId: props.activeQuestionAnswer.collectionId,
-      };
-      postNewAnswer(data).then((res) => {
-        setCollectionQuestionAnswers((collectionQuestionAnswers) =>
-          collectionQuestionAnswers.map((element) => {
-            if (element.questionId === res.data[0].question_id) {
-              const updatedAnswers = element.answers;
-              res.data.map((e: AnswersT) => updatedAnswers.push(e));
-              return { ...element, answers: updatedAnswers };
-            } else return element;
-          })
-        );
-        setIsSaveLoading(false);
-        props.setIsModalOpen(false);
-      });
+      const newAnswers = inputAnswers()
+        .map((answer) => answer.name)
+        .filter((answer) => answer.trim());
+
+      if (
+        question().length &&
+        props.activeQuestionAnswer?.name !== question()
+      ) {
+        // UPDATE QUESTION
+        // TODO: update question
+      }
+
+      // ADD ANSWER <===============COMPLETE!!!===============>
+      if (newAnswers.length) {
+        const data = {
+          answers: newAnswers,
+          questionId: props.activeQuestionAnswer.questionId,
+          collectionId: props.activeQuestionAnswer.collectionId,
+        };
+
+        postNewAnswer(data).then((res) => {
+          setCollectionQuestionAnswers((collectionQuestionAnswers) =>
+            collectionQuestionAnswers.map((element) => {
+              if (
+                res.data.length &&
+                element.questionId === res.data[0].question_id
+              ) {
+                const updatedAnswers = element.answers;
+                res.data.map((e: AnswersT) => updatedAnswers.push(e));
+                return { ...element, answers: updatedAnswers };
+              } else return element;
+            })
+          );
+        });
+      }
     }
+
+    resetStates();
   };
 
   const handleDeleteAnswer = (answerIndex: number) => {
-    // Move this to Save section START
-    const deleteDbAnswer = answers()[answerIndex] as AnswersT;
-    if (deleteDbAnswer?.id) {
-      deleteAnswer(deleteDbAnswer.id);
-    }
-    setAnswers(answers().filter((_, index) => index !== answerIndex));
+    const deletedAnswerId = answers[answerIndex] as AnswersT;
 
-    setCollectionQuestionAnswers((collectionQuestionAnswers) =>
-      collectionQuestionAnswers.filter((_, index) => index !== answerIndex)
-    );
-    // Move this to Save section END
+    deleteAnswer(deletedAnswerId.id)
+      .then((res) => {
+        if (res.statusCode === 200) {
+          setCollectionQuestionAnswers((collectionQuestionAnswers) =>
+            collectionQuestionAnswers.map((element) => {
+              if (
+                element.questionId === props.activeQuestionAnswer?.questionId
+              ) {
+                return {
+                  ...element,
+                  answers: props.activeQuestionAnswer.answers.filter(
+                    (answer) => answer.id !== deletedAnswerId.id
+                  ),
+                };
+              } else return element;
+            })
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-    const updatedDbAnswers = answers().filter((answer) => {
+    setAnswers(answers.filter((_, index) => index !== answerIndex));
+  };
+
+  const updateAnswers = () => {
+    const updatedDbAnswers = answers.filter((answer) => {
       const a = answer as AnswersT;
       if (a.id) return a;
     }) as AnswersT[];
 
-    const updatedInputAnswers = answers().filter((answer) => {
+    const updatedInputAnswers = answers.filter((answer) => {
       const a = answer as AnswersT;
       if (!a.id) return a;
     });
 
-    setDbAnswers(updatedDbAnswers);
     setInputAnswers(updatedInputAnswers);
   };
 
+  const handleUpdateAnswers = (
+    updatedIndex: number,
+    objKey: string,
+    updatedAnswer: string
+  ) => {
+    setAnswers(updatedIndex, objKey as "name", updatedAnswer);
+    updateAnswers();
+  };
+
   createEffect(() => {
-    if (props.activeQuestionAnswer?.answers) {
-      setDbAnswers(props.activeQuestionAnswer.answers);
+    if (props.activeQuestionAnswer?.answers[0].id) {
       setAnswers([
         ...props.activeQuestionAnswer?.answers,
-        ...inputAnswers.map((e) => e),
+        ...inputAnswers().map((e) => e),
       ]);
     } else {
-      setAnswers([...inputAnswers.map((e) => e)]);
+      setAnswers([...inputAnswers().map((e) => e)]);
     }
   });
 
@@ -153,12 +195,14 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
         fallback={<></>}
       >
         <QuestionAnswerForms
-          question={props.activeQuestionAnswer?.name || ""}
-          answers={answers()}
-          onAddAnswer={(answer) =>
-            setInputAnswers([...inputAnswers, { name: answer }])
-          }
+          question={question() || props.activeQuestionAnswer?.name || ""}
+          answers={answers}
+          onUpdateQuestion={(question) => setQuestion(question)}
           onDeleteAnswer={(answerIndex) => handleDeleteAnswer(answerIndex)}
+          onAddAnswer={(answer) =>
+            setInputAnswers([...inputAnswers(), { name: answer }])
+          }
+          onUpdateAnswer={handleUpdateAnswers}
         />
       </Show>
       <div class="mt-8 hero w-full">
@@ -174,42 +218,39 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
                 >
                   Cancel
                 </div>
-                <div
+                <button
                   title="Delete Question"
                   class="btn-error btn rounded-none w-44 no-animation"
                   onClick={() => handleDelete()}
                 >
                   Delete Question
-                </div>
-                <div
+                </button>
+                <button
                   title="Save Changes"
                   class="btn-primary btn rounded-l-none w-20 no-animation"
-                  onClick={() => {
-                    handleSave();
-                    setInputAnswers([]);
-                  }}
+                  onClick={() => handleSave()}
                 >
                   <Show when={isSaveLoading()} fallback="Save">
                     <LoadingSpinner size="default" />
                   </Show>
-                </div>
+                </button>
               </>
             }
           >
-            <div
+            <button
               title="Cancel Delete"
               class="btn rounded-r-none no-animation"
               onClick={() => setConfirmDelete(false)}
             >
               Cancel
-            </div>
-            <div
+            </button>
+            <button
               title="Confirm Delete"
               class="btn-error btn rounded-l-none no-animation w-64"
               onClick={() => handleDelete()}
             >
               Confirm Delete
-            </div>
+            </button>
           </Show>
         </div>
       </div>
