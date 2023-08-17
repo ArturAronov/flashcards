@@ -92,7 +92,7 @@ const NewQuestionAnswerForm = ({ collectionId }: { collectionId: string }) => {
             answers={inputAnswers}
             question={inputQuestion()}
             onUpdateAnswer={setInputAnswers}
-            onUpdateQuestion={(a) => setInputQuestion(a)}
+            onUpdateQuestion={(question) => setInputQuestion(question)}
             onAddAnswer={(answer) =>
               setInputAnswers([...inputAnswers, { name: answer }])
             }
