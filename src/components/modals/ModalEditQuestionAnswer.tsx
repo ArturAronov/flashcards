@@ -1,3 +1,4 @@
+import { createStore } from "solid-js/store";
 import { Show, createEffect, createSignal } from "solid-js";
 import {
   AnswersT,
@@ -8,7 +9,6 @@ import { serverUrl } from "../../lib/serverUrl";
 import ModalBase from "./ModalBase";
 import LoadingSpinner from "../LoadingSpinner";
 import QuestionAnswerForms from "../QuestionAnswerForms";
-import { createStore } from "solid-js/store";
 
 type PropsT = {
   isModalOpen: boolean;
@@ -21,6 +21,34 @@ type NewAnswersT = {
   answers: Array<string>;
   questionId: string;
   collectionId: string;
+};
+
+type UpdateQuestionT = {
+  name: string;
+  questionId: string;
+};
+
+const updateQuestion = async (data: UpdateQuestionT) => {
+  const response = await fetch(serverUrl + "/questions", {
+    mode: "cors",
+    method: "put",
+    credentials: "include",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  return await response.json();
+};
+
+const deleteQuestion = async (questionId: string) => {
+  const response = await fetch(serverUrl + `/questions/${questionId}`, {
+    mode: "cors",
+    method: "delete",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  return await response.json();
 };
 
 const postNewAnswer = async (data: NewAnswersT) => {
@@ -69,9 +97,20 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
     props.setIsModalOpen(false);
   };
 
-  const handleDelete = () => {
-    if (confirmDelete()) {
-      // TODO: API handler
+  const handleDeleteQuestion = () => {
+    if (confirmDelete() && props.activeQuestionAnswer?.questionId) {
+      // DELETE QUESTION <===============COMPLETE!!!===============>
+      deleteQuestion(props.activeQuestionAnswer.questionId)
+        .then((_) => {
+          setCollectionQuestionAnswers((collectionQuestionAnswers) =>
+            collectionQuestionAnswers.filter(
+              (element) =>
+                element.questionId !== props.activeQuestionAnswer?.questionId
+            )
+          );
+        })
+        .catch((err) => console.log(err));
+
       props.setIsModalOpen(false);
       setConfirmDelete(false);
     } else {
@@ -86,12 +125,25 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
         .map((answer) => answer.name)
         .filter((answer) => answer.trim());
 
+      // UPDATE QUESTION <===============COMPLETE!!!===============>
       if (
         question().length &&
         props.activeQuestionAnswer?.name !== question()
       ) {
-        // UPDATE QUESTION
-        // TODO: update question
+        const data = {
+          questionId: props.activeQuestionAnswer.questionId,
+          name: question(),
+        };
+
+        updateQuestion(data);
+
+        setCollectionQuestionAnswers((collectionQuestionAnswers) =>
+          collectionQuestionAnswers.map((element) => {
+            if (element.questionId === props.activeQuestionAnswer?.questionId) {
+              return { ...element, name: question() };
+            } else return element;
+          })
+        );
       }
 
       // ADD ANSWER <===============COMPLETE!!!===============>
@@ -123,6 +175,8 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
   };
 
   const handleDeleteAnswer = (answerIndex: number) => {
+    // DELETE ANSWER <===============COMPLETE!!!===============>
+
     const deletedAnswerId = answers[answerIndex] as AnswersT;
 
     deleteAnswer(deletedAnswerId.id)
@@ -221,7 +275,7 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
                 <button
                   title="Delete Question"
                   class="btn-error btn rounded-none w-44 no-animation"
-                  onClick={() => handleDelete()}
+                  onClick={() => handleDeleteQuestion()}
                 >
                   Delete Question
                 </button>
@@ -247,7 +301,7 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
             <button
               title="Confirm Delete"
               class="btn-error btn rounded-l-none no-animation w-64"
-              onClick={() => handleDelete()}
+              onClick={() => handleDeleteQuestion()}
             >
               Confirm Delete
             </button>
