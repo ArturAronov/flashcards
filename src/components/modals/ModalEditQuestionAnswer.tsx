@@ -10,68 +10,6 @@ import ModalBase from "./ModalBase";
 import LoadingSpinner from "../LoadingSpinner";
 import QuestionAnswerForms from "../QuestionAnswerForms";
 
-const boobs = [
-  {
-    questionId: "3515f72d-ef9b-41bf-8d3b-a3604b5179e9",
-    name: "Question nr 1",
-    collectionId: "8a475495-b9e2-4fa0-a634-235951691018",
-    date_created: "2023-08-08T22:28:25.937Z",
-    answers: [
-      {
-        id: "882f610e-935f-450c-8004-871c37bae5e8",
-        name: "Hello World",
-        wrong: 0,
-        correct: 0,
-        skipped: 0,
-      },
-    ],
-  },
-  {
-    questionId: "666ce232-3b97-4ac8-9631-18686aff3177",
-    name: "Updated Question",
-    collectionId: "8a475495-b9e2-4fa0-a634-235951691018",
-    date_created: "2023-08-08T22:08:59.100Z",
-    answers: [
-      {
-        id: "70521cdf-58ec-42ac-b6b0-d63228ee2024",
-        name: "Goodbye World",
-        wrong: 0,
-        correct: 0,
-        skipped: 0,
-      },
-    ],
-  },
-  {
-    questionId: "a2dd2ebe-ed94-4918-ad9e-299dfe3680c3",
-    name: "Question with no answers",
-    collectionId: "8a475495-b9e2-4fa0-a634-235951691018",
-    date_created: "2023-08-08T22:41:30.920Z",
-    answers: [
-      {
-        id: "638e80da-5f7e-4410-b2e4-7abf30cae823",
-        name: "7a",
-        wrong: 0,
-        correct: 0,
-        skipped: 0,
-      },
-      {
-        id: "1d5fcf84-bf09-460d-af1d-79233f158a09",
-        name: "8a",
-        wrong: 0,
-        correct: 0,
-        skipped: 0,
-      },
-      {
-        id: "ac595656-5d33-4d91-b711-9d12a50caab7",
-        name: "9a",
-        wrong: 0,
-        correct: 0,
-        skipped: 0,
-      },
-    ],
-  },
-];
-
 type PropsT = {
   isModalOpen: boolean;
   activeQuestionAnswer: CollectionQuestionAnswersT | null;
@@ -315,27 +253,12 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
     setAnswersCache(updatedAnswers.flat());
   };
 
-  const updateAnswers = () => {
-    const updatedDbAnswers = answers.filter((answer) => {
-      const a = answer as AnswersT;
-      if (a.id) return a;
-    }) as AnswersT[];
-
-    const updatedInputAnswers = answers.filter((answer) => {
-      const a = answer as AnswersT;
-      if (!a.id) return a;
-    });
-
-    setInputAnswers(updatedInputAnswers);
-  };
-
   const handleUpdateAnswers = (
     updatedIndex: number,
     objKey: string,
     updatedAnswer: string
   ) => {
     setAnswers(updatedIndex, objKey as "name", updatedAnswer);
-    // updateAnswers();
   };
 
   createEffect(() => {
