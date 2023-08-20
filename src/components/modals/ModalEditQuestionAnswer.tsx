@@ -244,7 +244,7 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
       .then((res) => {
         if (res.statusCode === 200) {
           setCollectionQuestionAnswers(updatedCollectionQuestionAnswers);
-          setAnswers(updatedAnswers.flat());
+          setAnswers([...updatedAnswers.flat(), ...inputAnswers()]);
         }
       })
       .catch((err) => {
