@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { Show, createEffect, createSignal } from "solid-js";
+import { on, Show, createEffect, createSignal } from "solid-js";
 import {
   AnswersT,
   CollectionQuestionAnswersT,
@@ -261,19 +261,30 @@ const ModalEditQuestionAnswer = (props: PropsT) => {
     setAnswers(updatedIndex, objKey as "name", updatedAnswer);
   };
 
-  createEffect(() => {
-    if (props.activeQuestionAnswer?.answers[0].id) {
-      setAnswers([
-        ...props.activeQuestionAnswer?.answers,
-        ...inputAnswers().map((e) => e),
-      ]);
-    } else {
-      setAnswers([...inputAnswers().map((e) => e)]);
-    }
+  createEffect(
+    on(inputAnswers, () => {
+      if (props.activeQuestionAnswer?.answers[0]) {
+        setAnswers([
+          ...props.activeQuestionAnswer?.answers,
+          ...inputAnswers().map((e) => e),
+        ]);
+      } else {
+        setAnswers([...inputAnswers().map((e) => e)]);
+      }
+    })
+  );
 
-    if (!answersCache().length && props.activeQuestionAnswer) {
-      setAnswersCache(JSON.parse(JSON.stringify(answers)));
-    }
+  createEffect(
+    on(answersCache, () => {
+      if (!answersCache().length && props.activeQuestionAnswer) {
+        setAnswersCache(JSON.parse(JSON.stringify(answers)));
+      }
+    })
+  );
+
+  createEffect(() => {
+    if (props.activeQuestionAnswer?.answers[0])
+      setAnswers(props.activeQuestionAnswer?.answers);
   });
 
   return (
