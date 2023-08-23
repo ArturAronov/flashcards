@@ -9,17 +9,7 @@ import {
 import NewQuestionAnswerForm from "./NewQuestionAnswerForm";
 import QuestionAnswerList from "./QuestionAnswerList";
 import LoadingSpinner from "../../LoadingSpinner";
-
-const getCollection = async (collectionId: string) => {
-  const response = await fetch(`${serverUrl}/collections/${collectionId}`, {
-    mode: "cors",
-    method: "get",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-  });
-
-  return await response.json();
-};
+import { getCollection } from "../../../lib/getCollection";
 
 const Collection = () => {
   const params = useParams();
