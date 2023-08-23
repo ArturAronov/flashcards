@@ -1,6 +1,5 @@
-import { For, Index, Show, createSignal } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import {
-  AnswersT,
   CollectionQuestionAnswersT,
   useCollectionQuestionAnswers,
 } from "../../../states/useQuestionAnswers";
@@ -38,7 +37,7 @@ const QuestionAnswerList = () => {
                       activeQuestionAnswer()?.questionId === element.questionId
                     }
                   />
-                  <div class="collapse-title text-xl font-medium">
+                  <div class="collapse-title text-xl font-semibold font-question">
                     {element.name}
                   </div>
                   <Show
@@ -57,9 +56,9 @@ const QuestionAnswerList = () => {
                   </Show>
                   <ul class="collapse-content">
                     <For each={element.answers}>
-                      {(answer, index) => {
-                        if (answer.id && answer.name.trim().length)
-                          return (
+                      {(answer, index) => (
+                        <>
+                          <Show when={!!answer} fallback={<></>}>
                             <li>
                               <Show
                                 when={index()}
@@ -86,8 +85,9 @@ const QuestionAnswerList = () => {
                                 </span>
                               </div>
                             </li>
-                          );
-                      }}
+                          </Show>
+                        </>
+                      )}
                     </For>
                   </ul>
                 </div>
