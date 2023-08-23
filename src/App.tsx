@@ -8,6 +8,7 @@ import { serverUrl } from "./lib/serverUrl";
 import { Nav } from "./components/Nav";
 import { Collections } from "./components/pages/collections/Collections";
 import Collection from "./components/pages/collection/Collection";
+import Play from "./components/pages/play/Play";
 
 const postUserSignIn = async () => {
   const response = await fetch(serverUrl + "/auth/validate-session", {
@@ -42,8 +43,9 @@ const App: Component = () => {
             <Route path="/sign-in" component={SignIn} />
             <Route path="/sign-up" component={SignUp} />
             <Route path="/settings" component={Settings} />
-            <Route path="/collection/:collectionId" component={Collection} />
             <Route path="/collections" component={Collections} />
+            <Route path="/play/:collectionId" component={Play} />
+            <Route path="/collection/:collectionId" component={Collection} />
           </Routes>
         </div>
       </Router>
