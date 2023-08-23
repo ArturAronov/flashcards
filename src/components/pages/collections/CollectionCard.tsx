@@ -28,11 +28,11 @@ const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
             <p>{collection.description}</p>
           </div>
         </A>
-        <div>
+        <div class="flex w-full border-t border-primary/25">
           <p class="text-xs text-error font-bold">{error()}</p>
           <button
-            title="Edit"
-            class="btn w-full btn-ghost no-animation card group rounded-bl-[15px] rounded-br-[15px] rounded-t-none"
+            title="Play"
+            class="btn flex-grow btn-ghost no-animation card group rounded-t-none rounded-r-none"
             onClick={() => {
               setError("");
               setActiveCollectionEdit(collection.id);
@@ -40,6 +40,14 @@ const CollectionCard = ({ collection }: { collection: UserCollectionsT }) => {
           >
             <SettingsIcon />
           </button>
+          <A
+            href={`/play/${collection.id}`}
+            class="border-l border-primary/25 flex-grow card group  rounded-br-[15px] rounded-t-none rounded-l-none"
+          >
+            <button class="btn btn-ghost no-animation  rounded-br-[15px] rounded-t-none rounded-l-none">
+              Play
+            </button>
+          </A>
         </div>
       </Show>
     </div>
