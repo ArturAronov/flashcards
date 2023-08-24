@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@solid-primitives/autofocus':
+    specifier: ^0.0.108
+    version: 0.0.108(solid-js@1.7.6)
   '@solidjs/router':
     specifier: ^0.8.2
     version: 0.8.2(solid-js@1.7.6)
@@ -683,6 +686,15 @@ packages:
       solid-js: 1.7.6
     dev: true
 
+  /@solid-primitives/autofocus@0.0.108(solid-js@1.7.6):
+    resolution: {integrity: sha512-ZWPOwyas6jw6SgwzTTSQKmdf9bJU540+dEMSA4dwA7MHvbksh38Z4Tyjo8YiJmVfbzKzJXgO18g81I1lLR28jw==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': 6.2.1(solid-js@1.7.6)
+      solid-js: 1.7.6
+    dev: false
+
   /@solid-primitives/bounds@0.0.111(solid-js@1.7.6):
     resolution: {integrity: sha512-9JdG6oAbTJr5cA2tLrVfchixpY37KOuFrjvw1pBSLf7PUbIN6c7AvvWhSI4Q5njvLwWWZG0NdcpCZ4VwXYst/g==}
     peerDependencies:
@@ -826,6 +838,14 @@ packages:
     dependencies:
       solid-js: 1.7.6
     dev: true
+
+  /@solid-primitives/utils@6.2.1(solid-js@1.7.6):
+    resolution: {integrity: sha512-TsecNzxiO5bLfzqb4OOuzfUmdOROcssuGqgh5rXMMaasoFZ3GoveUgdY1wcf17frMJM7kCNGNuK34EjErneZkg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.7.6
+    dev: false
 
   /@solidjs/router@0.8.2(solid-js@1.7.6):
     resolution: {integrity: sha512-gUKW+LZqxtX6y/Aw6JKyy4gQ9E7dLqp513oB9pSYJR1HM5c56Pf7eijzyXX+b3WuXig18Cxqah4tMtF0YGu80w==}

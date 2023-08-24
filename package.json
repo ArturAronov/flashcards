@@ -20,6 +20,7 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
+    "@solid-primitives/autofocus": "^0.0.108",
     "@solidjs/router": "^0.8.2",
     "date-fns": "^2.30.0",
     "solid-js": "^1.7.6"
