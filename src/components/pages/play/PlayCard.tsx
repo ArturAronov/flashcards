@@ -8,12 +8,12 @@ type DataT = {
   questionId: string;
 };
 
-const postUpdateAnswerStats = async ({ answers, questionId }: DataT) => {
-  const response = await fetch(serverUrl + `/answers/${questionId}`, {
+const postCorrectAnswerStats = async (data: DataT) => {
+  const response = await fetch(serverUrl + "/answers/correct", {
     mode: "cors",
     method: "post",
     credentials: "include",
-    body: JSON.stringify({ answers }),
+    body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
   });
 
@@ -37,11 +37,16 @@ const PlayCard = (props: {
   const handleSkip = () => incrementIndex();
 
   const handleSubmit = () => {
+    const dbAnswers = props.collectionQuestionAnswers[questionIndex()].answers;
     const answersArr = Object.values(answers());
-    postUpdateAnswerStats({
-      answers: answersArr,
-      questionId: props.collectionQuestionAnswers[questionIndex()].questionId,
-    });
+    const correctAnswers = dbAnswers.filter((answer) =>
+      answersArr.includes(answer.name)
+    );
+    console.log(correctAnswers);
+    // postUpdateAnswerStats({
+    //   answers: answersArr,
+    //   questionId: props.collectionQuestionAnswers[questionIndex()].questionId,
+    // });
     // TODO: API handler here
   };
 
