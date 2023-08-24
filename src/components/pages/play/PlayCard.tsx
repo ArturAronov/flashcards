@@ -1,19 +1,43 @@
-import { createSignal } from "solid-js";
-import { classNames } from "../../../lib/classNames";
-import { CollectionQuestionAnswersT } from "../../../states/useQuestionAnswers";
+import { For, Show, createSignal } from "solid-js";
 import { serverUrl } from "../../../lib/serverUrl";
+import { classNames } from "../../../lib/classNames";
+import { autofocus } from "@solid-primitives/autofocus";
+import {
+  AnswersT,
+  CollectionQuestionAnswersT,
+} from "../../../states/useQuestionAnswers";
+import LoadingSpinner from "../../LoadingSpinner";
 
-type DataT = {
-  answers: Array<string>;
-  questionId: string;
-};
-
-const postCorrectAnswerStats = async (data: DataT) => {
+const postCorrectAnswerStats = async (answers: Array<AnswersT>) => {
   const response = await fetch(serverUrl + "/answers/correct", {
     mode: "cors",
     method: "post",
     credentials: "include",
-    body: JSON.stringify(data),
+    body: JSON.stringify({ answers }),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  return await response.json();
+};
+
+const postWrongAnswerStats = async (answers: Array<AnswersT>) => {
+  const response = await fetch(serverUrl + "/answers/wrong", {
+    mode: "cors",
+    method: "post",
+    credentials: "include",
+    body: JSON.stringify({ answers }),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  return await response.json();
+};
+
+const postSkippedAnswerStats = async (answers: Array<AnswersT>) => {
+  const response = await fetch(serverUrl + "/answers/skip", {
+    mode: "cors",
+    method: "post",
+    credentials: "include",
+    body: JSON.stringify({ answers }),
     headers: { "Content-Type": "application/json" },
   });
 
@@ -23,8 +47,10 @@ const postCorrectAnswerStats = async (data: DataT) => {
 const PlayCard = (props: {
   collectionQuestionAnswers: Array<CollectionQuestionAnswersT>;
 }) => {
-  const [answers, setAnswers] = createSignal<{ [key: number]: string }>({});
   const [questionIndex, setQuestionIndex] = createSignal<number>(0);
+  const [isBtnsDisabled, setIsBtnsDisabled] = createSignal<boolean>(false);
+  const [isAnswerVisible, setIsAnswerVisible] = createSignal<boolean>(false);
+  const [answers, setAnswers] = createSignal<{ [key: number]: string }>({});
 
   const incrementIndex = () => {
     if (questionIndex() === props.collectionQuestionAnswers.length - 1) {
@@ -34,20 +60,43 @@ const PlayCard = (props: {
     }
   };
 
-  const handleSkip = () => incrementIndex();
+  const handleSkip = async () => {
+    setIsBtnsDisabled(true);
+    setAnswers({});
+    setIsAnswerVisible(true);
+    await postSkippedAnswerStats(
+      props.collectionQuestionAnswers[questionIndex()].answers
+    ).then((_) => {
+      setTimeout(() => {
+        setIsAnswerVisible(false);
+        setIsBtnsDisabled(false);
+        incrementIndex();
+      }, 2000);
+    });
+  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsBtnsDisabled(true);
+
     const dbAnswers = props.collectionQuestionAnswers[questionIndex()].answers;
     const answersArr = Object.values(answers());
     const correctAnswers = dbAnswers.filter((answer) =>
       answersArr.includes(answer.name)
     );
-    console.log(correctAnswers);
-    // postUpdateAnswerStats({
-    //   answers: answersArr,
-    //   questionId: props.collectionQuestionAnswers[questionIndex()].questionId,
-    // });
-    // TODO: API handler here
+    const wrongAnswers = dbAnswers.filter(
+      (answer) => !answersArr.includes(answer.name)
+    );
+    setIsAnswerVisible(true);
+
+    await postWrongAnswerStats(wrongAnswers);
+    await postCorrectAnswerStats(correctAnswers).then((_) => {
+      setTimeout(() => {
+        setIsAnswerVisible(false);
+        setIsBtnsDisabled(false);
+        setAnswers({});
+        incrementIndex();
+      }, 2000);
+    });
   };
 
   return (
@@ -69,39 +118,76 @@ const PlayCard = (props: {
             e.preventDefault();
           }}
         >
-          {props.collectionQuestionAnswers[questionIndex()].answers.map(
-            (answer, index) => {
+          <For each={props.collectionQuestionAnswers[questionIndex()].answers}>
+            {(answer, index) => {
               return (
                 <div class="mb-3">
-                  <input
-                    type="text"
-                    placeholder={`Answer #${index + 1}`}
-                    class="input w-64 border-neutral/50 !outline-none focus:border-neutral"
-                    onInput={(e) => {
-                      setAnswers({
-                        ...answers(),
-                        [index]: e.currentTarget.value,
-                      });
-                    }}
-                  />
+                  <Show
+                    when={isAnswerVisible()}
+                    fallback={
+                      <input
+                        autofocus
+                        ref={autofocus}
+                        type="text"
+                        value={answers()[index()] || ""}
+                        placeholder={`Answer #${index() + 1}`}
+                        class="input w-64 border-neutral/50 !outline-none focus:border-neutral"
+                        onInput={(e) => {
+                          setAnswers({
+                            ...answers(),
+                            [index()]: e.currentTarget.value,
+                          });
+                        }}
+                      />
+                    }
+                  >
+                    <input
+                      type="text"
+                      disabled={true}
+                      value={`${
+                        Object.values(answers()).includes(answer.name)
+                          ? "✅"
+                          : "❎"
+                      } ${answer.name}`}
+                      placeholder={`Answer #${index() + 1}`}
+                      class={classNames(
+                        Object.values(answers()).includes(answer.name)
+                          ? "!text-primary"
+                          : "!text-error",
+                        "input w-64 border-neutral/50 !outline-none focus:border-neutral"
+                      )}
+                    />
+                  </Show>
                 </div>
               );
-            }
-          )}
+            }}
+          </For>
           <div class="flex pt-3">
             <button
+              disabled={isBtnsDisabled()}
               type="button"
               onClick={() => handleSkip()}
               class="no-animation flex-grow btn rounded-r-none"
             >
-              Skip
+              <Show
+                when={!isBtnsDisabled()}
+                fallback={<LoadingSpinner size="default" />}
+              >
+                Skip
+              </Show>
             </button>
             <button
+              disabled={isBtnsDisabled()}
               type="submit"
               class="no-animation flex-grow btn btn-primary rounded-l-none"
               onClick={() => handleSubmit()}
             >
-              Submit
+              <Show
+                when={!isBtnsDisabled()}
+                fallback={<LoadingSpinner size="default" />}
+              >
+                Submit
+              </Show>
             </button>
           </div>
         </form>
