@@ -47,6 +47,9 @@ const postSkippedAnswerStats = async (answers: Array<AnswersT>) => {
 const PlayCard = (props: {
   collectionQuestionAnswers: Array<CollectionQuestionAnswersT>;
 }) => {
+  // prevents from being tree-shaken by TS
+  autofocus;
+
   const [questionIndex, setQuestionIndex] = createSignal<number>(0);
   const [isBtnsDisabled, setIsBtnsDisabled] = createSignal<boolean>(false);
   const [isAnswerVisible, setIsAnswerVisible] = createSignal<boolean>(false);
@@ -126,8 +129,8 @@ const PlayCard = (props: {
                     when={isAnswerVisible()}
                     fallback={
                       <input
-                        autofocus
-                        ref={autofocus}
+                        autofocus={index() === 0}
+                        use:autofocus
                         type="text"
                         value={answers()[index()] || ""}
                         placeholder={`Answer #${index() + 1}`}
