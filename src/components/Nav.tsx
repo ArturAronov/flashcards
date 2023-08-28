@@ -34,34 +34,32 @@ const DesktopNav = () => {
   );
 };
 
-const MenuBtns = () => {};
-
 const MobileNav = () => {
   return (
-    <div class="dropdown dropdown-hover dropdown-bottom dropdown-end md:hidden">
-      <label tabIndex={0} class="btn-square btn no-animation w-28 btn-ghost">
+    <div class="dropdown dropdown-end md:hidden">
+      <label tabindex="0" class="btn btn-ghost btn-circle">
         <svg
-          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
-          class="inline-block w-5 h-5 stroke-current"
+          stroke="currentColor"
         >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-          ></path>
+            d="M4 6h16M4 12h16M4 18h7"
+          />
         </svg>
       </label>
       <ul
         tabIndex={0}
-        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2.5"
       >
         <li class="mt-1">
           <A
             href="/collections"
-            class="btn-square btn no-animation w-48 btn-ghost"
+            class="btn-square btn no-animation w-48 btn-ghost pt-4"
           >
             Collections
           </A>
@@ -69,14 +67,14 @@ const MobileNav = () => {
         <li class="mt-1">
           <A
             href="/settings"
-            class="btn-square btn no-animation w-48 btn-ghost"
+            class="btn-square btn no-animation w-48 btn-ghost pt-4"
           >
             Settings
           </A>
         </li>
         <li class="mt-1">
           <a
-            class="btn-square btn no-animation w-48 btn-ghost text-error"
+            class="btn-square btn no-animation w-48 btn-ghost text-error pt-4"
             onClick={() => postUserSignOut()}
           >
             Sign Out
@@ -93,8 +91,8 @@ export const Nav = () => {
   return (
     <div class="navbar bg-base-100 shadow-lg">
       <div class="mx-3 flex justify-between w-full">
-        <A href="/" class="normal-case text-xl select-none">
-          Hello World
+        <A href="/" class="text-xl select-none font-bold uppercase">
+          Savorim
         </A>
         <Show
           when={!!userId("").length}

@@ -82,24 +82,53 @@ const PlayCard = (props: {
     setIsBtnsDisabled(true);
 
     const dbAnswers = props.collectionQuestionAnswers[questionIndex()].answers;
-    const answersArr = Object.values(answers());
+    const answersArr = Object.values(answers())
+      .map((answer) => answer.toLowerCase().trim())
+      .filter((answer) => answer.length);
     const correctAnswers = dbAnswers.filter((answer) =>
-      answersArr.includes(answer.name)
+      answersArr.includes(answer.name.toLowerCase().trim())
     );
     const wrongAnswers = dbAnswers.filter(
-      (answer) => !answersArr.includes(answer.name)
+      (answer) => !answersArr.includes(answer.name.toLowerCase().trim())
     );
-    setIsAnswerVisible(true);
 
-    await postWrongAnswerStats(wrongAnswers);
-    await postCorrectAnswerStats(correctAnswers).then((_) => {
-      setTimeout(() => {
-        setIsAnswerVisible(false);
-        setIsBtnsDisabled(false);
+    if (wrongAnswers.length && correctAnswers.length) {
+      await postWrongAnswerStats(wrongAnswers).then((_) => {
+        setTimeout(() => {
+          setIsAnswerVisible(false);
+          setIsBtnsDisabled(false);
+        }, 1500);
+      });
+
+      await postCorrectAnswerStats(correctAnswers).then((_) => {
         setAnswers({});
         incrementIndex();
-      }, 2000);
-    });
+      });
+    }
+
+    if (wrongAnswers.length) {
+      await postWrongAnswerStats(wrongAnswers).then((_) => {
+        setTimeout(() => {
+          setIsAnswerVisible(false);
+          setIsBtnsDisabled(false);
+          setAnswers({});
+          incrementIndex();
+        }, 1500);
+      });
+    }
+
+    if (correctAnswers.length) {
+      await postCorrectAnswerStats(correctAnswers).then((_) => {
+        setTimeout(() => {
+          setIsAnswerVisible(false);
+          setIsBtnsDisabled(false);
+          setAnswers({});
+          incrementIndex();
+        }, 1500);
+      });
+    }
+
+    setIsAnswerVisible(true);
   };
 
   return (
@@ -148,10 +177,12 @@ const PlayCard = (props: {
                       type="text"
                       disabled={true}
                       value={`${
-                        Object.values(answers()).includes(answer.name)
+                        Object.values(answers())
+                          .map((answer) => answer.toLowerCase())
+                          .includes(answer.name.toLowerCase().trim())
                           ? "✅"
                           : "❎"
-                      } ${answer.name}`}
+                      } ${answer.name.trim()}`}
                       placeholder={`Answer #${index() + 1}`}
                       class={classNames(
                         Object.values(answers()).includes(answer.name)
